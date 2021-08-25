@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
@@ -23,34 +22,24 @@ namespace Dotnet.Customers.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
-            services.AddDbContext<CustomerContext>(opt => opt.UseInMemoryDatabase("TestDb"));
-            services.AddScoped<ICustomerService, CustomerService>();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Dotnet.Customers.Api", Version = "v1" });
-            });
+            services.AddDbContext<CustomerContext>(opt => opt.UseInMemoryDatabase("TestDb"))
+                .AddScoped<ICustomerService, CustomerService>()
+                .AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "Dotnet.Customers.Api", Version = "v1" }); 
+                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dotnet.Customers.Api v1"));
-            }
-            app.AddExceptionHandler(loggerFactory, Configuration);
-            app.UseMiddleware<RequestResponseLogger>();
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseSwagger()
+                .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dotnet.Customers.Api v1"))
+                .AddExceptionHandler(loggerFactory, Configuration)
+                .UseMiddleware<RequestResponseLogger>()
+                .UseRouting()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
         }
     }
 }
