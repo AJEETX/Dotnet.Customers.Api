@@ -40,7 +40,7 @@ namespace Dotnet.Customers.Api.Controllers
             return Ok(customer);
         }
         [HttpGet("{q}")]
-        [ProducesResponseType(typeof(IEnumerable<Customer>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<CustomerDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Search(string q)
@@ -52,7 +52,7 @@ namespace Dotnet.Customers.Api.Controllers
             return Ok(customers);
         }
         [HttpPost]
-        [ProducesResponseType(typeof(Customer), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(CustomerDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PostAsync(CustomerDto customerDto)
@@ -76,7 +76,7 @@ namespace Dotnet.Customers.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(typeof(Customer), StatusCodes.Status204NoContent)]
+        [ProducesResponseType( StatusCodes.Status204NoContent)]
         public async Task<IActionResult> PutAsync(int id, CustomerDto customerDto)
         {
             if (!ModelState.IsValid || id <= 0 || customerDto == default) return BadRequest($"The {nameof(id)} and/or {nameof(customerDto)} is invalid");
@@ -100,7 +100,7 @@ namespace Dotnet.Customers.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType( StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id <= 0) return BadRequest($"The {nameof(id)} is invalid");
