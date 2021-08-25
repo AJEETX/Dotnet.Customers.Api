@@ -27,10 +27,11 @@ namespace Dotnet.Customers.Api.Domain.Services
     //THE IMPLMENTATION BETTER BE `internal'
     internal class CustomerService : ICustomerService
     {
+        private const string ALL = "all";
         private readonly CustomerContext _customerContext;
         private readonly IMemoryCache _memoryCache;
         private readonly AppSettings _appSettings;
-        public CustomerService(IMemoryCache memoryCache, IOptions<AppSettings> options,CustomerContext customerContext)
+        public CustomerService(IMemoryCache memoryCache, IOptions<AppSettings> options, CustomerContext customerContext)
         {
             _memoryCache = memoryCache;
             _appSettings = options.Value;
@@ -40,7 +41,7 @@ namespace Dotnet.Customers.Api.Domain.Services
         public async Task<Customer> AddAsync(CustomerDto customerDto)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
-
+            if (default == customerDto) throw new ArgumentNullException($"{nameof(CustomerService)}:{nameof(AddAsync)} {nameof(customerDto)} ");
             var customer = new Customer
             {
                 FirstName = customerDto.FirstName,
@@ -56,6 +57,7 @@ namespace Dotnet.Customers.Api.Domain.Services
         public async Task DeleteAsync(int id)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
+            if (0 >= id) throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(DeleteAsync)} {nameof(id)} = {id}");
 
             var customer = await GetByIdAsync(id);
             _customerContext.Customers.Remove(customer);
@@ -65,21 +67,23 @@ namespace Dotnet.Customers.Api.Domain.Services
         public async Task<Customer> GetByIdAsync(int id)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
+            if (0 >= id) throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(GetByIdAsync)} {nameof(id)} = {id}");
+
             if (_memoryCache.TryGetValue(nameof(GetByIdAsync) + id.ToString(), out Customer cachedResponse)) return cachedResponse;
 
             var customer = await _customerContext.Customers.FindAsync(id);
-            SetCache(nameof(GetByIdAsync)+ id.ToString(), customer);
+
+            // SET THE CACHE WITH SEARCH KEYWORD AS KEY AND RESPONSE
+            SetCache(nameof(GetByIdAsync) + id.ToString(), customer);
             return customer;
         }
 
         public async Task<IList<Customer>> SearchAsync(string q)
         {
-            //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
-            if (string.IsNullOrWhiteSpace(q)) return default;
+            q = q?.ToLowerInvariant().Trim();
 
-            if (_memoryCache.TryGetValue(nameof(SearchAsync) + q.ToLowerInvariant().Trim(), out IList<Customer> cachedResponse)) return cachedResponse;
-            q = q.ToLowerInvariant().Trim();
-            
+            if (_memoryCache.TryGetValue(nameof(SearchAsync) + q ?? ALL, out IList<Customer> cachedResponse)) return cachedResponse;
+
             var customers = await _customerContext.Customers.Where(c =>
             c.FirstName.ToLowerInvariant().Trim().StartsWith(q) || c.LastName.ToLowerInvariant().Trim().StartsWith(q)).ToListAsync();
 
@@ -91,7 +95,7 @@ namespace Dotnet.Customers.Api.Domain.Services
         public async Task UpdateAsync(int id, CustomerDto customerDto)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
-            if (0 >= id || customerDto == default) return;
+            if (0 >= id || customerDto == default) throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(UpdateAsync)} {nameof(id)} = {id} / or {nameof(customerDto)} is null");
 
             var customer = await GetByIdAsync(id);
 
@@ -103,6 +107,8 @@ namespace Dotnet.Customers.Api.Domain.Services
 
             await _customerContext.SaveChangesAsync();
         }
+
+        #region PRIVATE BEHAVIOUR
         private void SetCache(string key, object value)
         {
             _memoryCache.Set(key, value, new MemoryCacheEntryOptions
@@ -111,5 +117,6 @@ namespace Dotnet.Customers.Api.Domain.Services
                 SlidingExpiration = TimeSpan.FromMinutes(_appSettings.CacheSettings.SlidingExpiration)
             });
         }
+        #endregion
     }
 }
