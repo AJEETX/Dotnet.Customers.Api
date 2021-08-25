@@ -1,11 +1,13 @@
 using Dotnet.Customers.Api.Domain.Models;
 using Dotnet.Customers.Api.Domain.Services;
+using Dotnet.Customers.Api.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace Dotnet.Customers.Api
@@ -31,7 +33,7 @@ namespace Dotnet.Customers.Api
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -39,7 +41,8 @@ namespace Dotnet.Customers.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dotnet.Customers.Api v1"));
             }
-
+            app.AddExceptionHandler(loggerFactory, Configuration);
+            app.UseMiddleware<RequestResponseLogger>();
             app.UseRouting();
 
             app.UseAuthorization();

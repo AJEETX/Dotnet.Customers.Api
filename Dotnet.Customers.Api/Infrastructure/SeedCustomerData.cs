@@ -13,8 +13,6 @@ namespace Dotnet.Customers.Api.Infrastructure
             using (var dbContext = new CustomerContext(
             serviceProvider.GetRequiredService<DbContextOptions<CustomerContext>>()))
             {
-
-
                 if (!dbContext.Customers.Any())
                     dbContext.Customers.AddRange(new[]
                     {
