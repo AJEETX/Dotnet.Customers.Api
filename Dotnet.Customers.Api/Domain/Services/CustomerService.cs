@@ -14,13 +14,9 @@ namespace Dotnet.Customers.Api.Domain.Services
     public interface ICustomerService
     {
         Task<Customer> GetByIdAsync(int id);
-
         Task<IList<Customer>> SearchAsync(string q);
-
         Task<Customer> AddAsync(CustomerDto customerDto);
-
         Task UpdateAsync(int id, CustomerDto customerDto);
-
         Task DeleteAsync(int id);
     }
 
@@ -42,12 +38,15 @@ namespace Dotnet.Customers.Api.Domain.Services
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
             if (default == customerDto) throw new ArgumentNullException($"{nameof(CustomerService)}:{nameof(AddAsync)} {nameof(customerDto)} ");
+            
+            //auto-mapper can be used as well instead
             var customer = new Customer
             {
                 FirstName = customerDto.FirstName,
                 LastName = customerDto.LastName,
                 DateOfBirth = customerDto.DateOfBirth
             };
+
             await _customerContext.Customers.AddAsync(customer);
 
             await _customerContext.SaveChangesAsync();
@@ -60,7 +59,9 @@ namespace Dotnet.Customers.Api.Domain.Services
             if (0 >= id) throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(DeleteAsync)} {nameof(id)} = {id}");
 
             var customer = await GetByIdAsync(id);
+
             _customerContext.Customers.Remove(customer);
+            
             await _customerContext.SaveChangesAsync();
         }
 
