@@ -1,4 +1,5 @@
 using Dotnet.Customers.Api.Domain.Models;
+using Dotnet.Customers.Api.Domain.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ namespace Dotnet.Customers.Api
 
             services.AddControllers();
             services.AddDbContext<CustomerContext>(opt => opt.UseInMemoryDatabase("TestDb"));
-
+            services.AddScoped<ICustomerService, CustomerService>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Dotnet.Customers.Api", Version = "v1" });

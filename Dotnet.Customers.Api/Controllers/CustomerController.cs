@@ -1,4 +1,5 @@
 ﻿using Dotnet.Customers.Api.Domain.Models;
+using Dotnet.Customers.Api.Domain.Services;
 using Dotnet.Customers.Api.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,21 +11,17 @@ using System.Threading.Tasks;
 
 namespace Dotnet.Customers.Api.Controllers
 {
-    /// <summary>
-    /// Customer Web Api
-    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        //inject the DBContext and logger into the controller...
-        private readonly CustomerContext _customerContext;
+        private readonly ICustomerService _customerContext;
 
-        public CustomerController(CustomerContext customerContext)
+        public CustomerController(ICustomerService customerContext)
         {
             _customerContext = customerContext;
         }
-        [HttpGet("{id:int}",Name = "GetByIdAsync")]
+        [HttpGet("{id:int}", Name = "GetByIdAsync")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -33,7 +30,7 @@ namespace Dotnet.Customers.Api.Controllers
         {
             if (id <= 0) return BadRequest($"The {nameof(id)} is invalid");
 
-            var customer = await _customerContext.Customers.FindAsync(id);
+            var customer = await _customerContext.GetByIdAsync(id);
 
             if (customer == default) return NotFound($"Oops !!! Customer not found with {nameof(id)}: {id}");
 
@@ -46,9 +43,9 @@ namespace Dotnet.Customers.Api.Controllers
         public async Task<IActionResult> Search(string q)
         {
             if (string.IsNullOrEmpty(q)) return BadRequest($"The search parameter {nameof(q)} is empty");
-            
-            var customers = await _customerContext.Customers.Where(c => c.FirstName.ToLowerInvariant().Trim().StartsWith(q.ToLowerInvariant().Trim())
-             || c.LastName.ToLowerInvariant().Trim().StartsWith(q.ToLowerInvariant().Trim())).ToListAsync();
+
+            var customers = await _customerContext.SearchAsync(q);
+
             return Ok(customers);
         }
         [HttpPost]
@@ -59,16 +56,7 @@ namespace Dotnet.Customers.Api.Controllers
         {
             if (customerDto == null || !ModelState.IsValid) return BadRequest($"The {nameof(customerDto)} is invalid");
 
-            var customer = new Customer
-            {
-                FirstName = customerDto.FirstName,
-                LastName = customerDto.LastName,
-                DateOfBirth = customerDto.DateOfBirth
-            };
-
-            await _customerContext.Customers.AddAsync(customer);
-
-            await _customerContext.SaveChangesAsync();
+            var customer = await _customerContext.AddAsync(customerDto);
 
             return CreatedAtRoute(nameof(GetByIdAsync), new { id = customer.Id }, customerDto);
         }
@@ -76,44 +64,37 @@ namespace Dotnet.Customers.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType( StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> PutAsync(int id, CustomerDto customerDto)
         {
             if (!ModelState.IsValid || id <= 0 || customerDto == default) return BadRequest($"The {nameof(id)} and/or {nameof(customerDto)} is invalid");
-            
-            var customer = await _customerContext.Customers.FindAsync(id);
 
-            if (customer == default)  return NotFound($"Customer with {nameof(id)} : {id} not found");
+            var customer = await _customerContext.GetByIdAsync(id);
 
-            customer.FirstName = customerDto.FirstName;
-            customer.LastName = customerDto.LastName;
-            customer.DateOfBirth = customerDto.DateOfBirth;
+            if (customer == default) return NotFound($"Customer with {nameof(id)} : {id} not found");
 
-            _customerContext.Customers.Update(customer);
-
-            await _customerContext.SaveChangesAsync();
+            await _customerContext.UpdateAsync(id, customerDto);
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType( StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id <= 0) return BadRequest($"The {nameof(id)} is invalid");
-            
 
-            var customer = await _customerContext.Customers.FindAsync(id);
+
+            var customer = await _customerContext.GetByIdAsync(id);
 
             if (customer == default)
             {
                 return NotFound($"Oops !!! Customer not found with {nameof(id)}: {id}");
             }
-            _customerContext.Customers.Remove(customer);
-            await _customerContext.SaveChangesAsync();
+            await _customerContext.DeleteAsync(id);
             return NoContent();
         }
     }
