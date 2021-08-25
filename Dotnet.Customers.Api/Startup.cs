@@ -24,7 +24,9 @@ namespace Dotnet.Customers.Api
         {
             services.AddControllers();
             services.AddDbContext<CustomerContext>(opt => opt.UseInMemoryDatabase("TestDb"))
+                .AddMemoryCache()
                 .AddScoped<ICustomerService, CustomerService>()
+                .Configure<AppSettings>(Configuration.GetSection("AppSettings"))
                 .AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Dotnet.Customers.Api", Version = "v1" });
