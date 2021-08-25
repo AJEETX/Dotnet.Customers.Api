@@ -24,7 +24,7 @@ namespace Dotnet.Customers.Api.Controllers
         {
             _customerContext = customerContext;
         }
-        [HttpGet("{id:int}", Name = "GetByIdAsync")]
+        [HttpGet("{id:int}", Name = nameof(GetByIdAsync))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
