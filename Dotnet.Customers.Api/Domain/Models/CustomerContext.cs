@@ -1,8 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Dotnet.Customers.Api.Domain.Models
 {
@@ -14,6 +10,7 @@ namespace Dotnet.Customers.Api.Domain.Models
         }
 
         public DbSet<Customer> Customers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Customer>(

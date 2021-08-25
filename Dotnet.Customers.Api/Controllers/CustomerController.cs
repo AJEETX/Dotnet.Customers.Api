@@ -1,12 +1,8 @@
-﻿using Dotnet.Customers.Api.Domain.Models;
-using Dotnet.Customers.Api.Domain.Services;
+﻿using Dotnet.Customers.Api.Domain.Services;
 using Dotnet.Customers.Api.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -24,6 +20,7 @@ namespace Dotnet.Customers.Api.Controllers
         {
             _customerContext = customerContext;
         }
+
         [HttpGet("{id:int}", Name = nameof(GetByIdAsync))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -39,6 +36,7 @@ namespace Dotnet.Customers.Api.Controllers
 
             return Ok(customer);
         }
+
         [HttpGet("{q}")]
         [ProducesResponseType(typeof(IEnumerable<CustomerDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -51,6 +49,7 @@ namespace Dotnet.Customers.Api.Controllers
 
             return Ok(customers);
         }
+
         [HttpPost]
         [ProducesResponseType(typeof(CustomerDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -63,6 +62,7 @@ namespace Dotnet.Customers.Api.Controllers
 
             return CreatedAtRoute(nameof(GetByIdAsync), new { id = customer.Id }, customerDto);
         }
+
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,7 +74,7 @@ namespace Dotnet.Customers.Api.Controllers
 
             var customer = await _customerContext.GetByIdAsync(id);
 
-            if (customer == default) return NotFound($"Customer with {nameof(id)} : {id} not found");
+            if (customer == default) return NotFound($"Oops !!! Customer not found with {nameof(id)}: {id}");
 
             await _customerContext.UpdateAsync(id, customerDto);
 
@@ -90,13 +90,10 @@ namespace Dotnet.Customers.Api.Controllers
         {
             if (id <= 0) return BadRequest($"The {nameof(id)} is invalid");
 
-
             var customer = await _customerContext.GetByIdAsync(id);
 
-            if (customer == default)
-            {
-                return NotFound($"Oops !!! Customer not found with {nameof(id)}: {id}");
-            }
+            if (customer == default) return NotFound($"Oops !!! Customer not found with {nameof(id)}: {id}");
+
             await _customerContext.DeleteAsync(id);
             return NoContent();
         }

@@ -1,11 +1,7 @@
-﻿using Dotnet.Customers.Api.Helpers;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Dotnet.Customers.Api.Domain.Models
 {
@@ -15,16 +11,17 @@ namespace Dotnet.Customers.Api.Domain.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [JsonIgnore]
         public int Id { get; set; }
+
         /// <summary>
-        /// First Name 
-        /// </summary>       
+        /// First Name
+        /// </summary>
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Please use only Letters")]
         [Required(ErrorMessage = "First Name is required")]
         [StringLength(250, MinimumLength = 3, ErrorMessage = "First Name has to be between 3 and 250 Characters only")]
         public string FirstName { get; set; }
 
         /// <summary>
-        /// Last Name 
+        /// Last Name
         /// </summary>
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Please use only Letters")]
         [Required(ErrorMessage = "Last Name is required")]
@@ -33,7 +30,7 @@ namespace Dotnet.Customers.Api.Domain.Models
 
         /// <summary>
         /// Date Of Birth
-        /// </summary  
+        /// </summary
         [Required(ErrorMessage = "Date of Birth is required")]
         public DateTime DateOfBirth { get; set; }
     }

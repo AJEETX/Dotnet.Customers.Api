@@ -2,14 +2,8 @@ using Dotnet.Customers.Api.Domain.Models;
 using Dotnet.Customers.Api.Infrastructure;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Dotnet.Customers.Api
 {
@@ -26,7 +20,6 @@ namespace Dotnet.Customers.Api
                 //3. Get the instance of CustomerDBContext in our services layer
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<CustomerContext>();
-
 
                 //4. Call the SeedCustomerData to create sample data
                 SeedCustomerData.Initialize(services);
