@@ -1,18 +1,13 @@
-﻿using Dotnet.Customers.Api.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Dotnet.Customers.Api.Domain
+namespace Dotnet.Customers.Api.Dtos
 {
-    public class Customer
+    public class CustomerDto
     {
-        [Key]
-        [JsonIgnore]
-        public int Id { get; set; }
         /// <summary>
         /// First Name 
         /// </summary>       

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Dotnet.Customers.Api.Domain
+namespace Dotnet.Customers.Api.Domain.Models
 {
     public class CustomerContext : DbContext
     {
@@ -21,8 +21,8 @@ namespace Dotnet.Customers.Api.Domain
                 {
                     b.Property("Id");
                     b.HasKey("Id");
-                    b.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
-                    b.Property(e => e.LastName).IsRequired().HasMaxLength(100);
+                    b.Property(e => e.FirstName).IsRequired().HasMaxLength(250);
+                    b.Property(e => e.LastName).IsRequired().HasMaxLength(250);
                     b.Property(e => e.DateOfBirth);
                 });
 
