@@ -2,6 +2,7 @@
 using Dotnet.Customers.Api.Domain.Models;
 using Dotnet.Customers.Api.Domain.Services;
 using Dotnet.Customers.Api.Dtos;
+using Dotnet.Customers.Api.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
@@ -27,6 +28,7 @@ namespace Dotnet.Customers.Api.Controllers
             _customerService = customerService;
         }
 
+        [RequestRateLimit(Name = nameof(GetByIdAsync),Order = 1, Seconds = 1)]
         [HttpGet("{id:int}", Name = nameof(GetByIdAsync))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
