@@ -7,7 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Dotnet.Customers.Api
 {
@@ -22,7 +27,10 @@ namespace Dotnet.Customers.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+            });
             services.AddDbContext<CustomerContext>(opt => opt.UseInMemoryDatabase("TestDb"))
                 .AddMemoryCache()
                 .AddScoped<ICustomerService, CustomerService>()
@@ -31,6 +39,7 @@ namespace Dotnet.Customers.Api
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Dotnet.Customers.Api", Version = "v1" });
                 });
+            services.AddFeatureManagement();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
@@ -44,6 +53,19 @@ namespace Dotnet.Customers.Api
                 {
                     endpoints.MapControllers();
                 });
+        }
+    }
+    public class DateTimeConverter : JsonConverter<DateTime>
+    {
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            Debug.Assert(typeToConvert == typeof(DateTime));
+            return DateTime.Parse(reader.GetString());
+        }
+
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value.ToString("dd-MM-yyyy"));
         }
     }
 }

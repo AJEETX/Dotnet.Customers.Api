@@ -2,6 +2,7 @@
 using Dotnet.Customers.Api.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement.Mvc;
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace Dotnet.Customers.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [FeatureGate("customer")]
     [Produces(MediaTypeNames.Application.Json)]
     [Consumes(MediaTypeNames.Application.Json)]
     public class CustomerController : ControllerBase
