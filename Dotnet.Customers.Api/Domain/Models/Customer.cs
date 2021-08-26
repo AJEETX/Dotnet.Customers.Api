@@ -9,7 +9,6 @@ namespace Dotnet.Customers.Api.Domain.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int Id { get; set; }
 
         /// <summary>

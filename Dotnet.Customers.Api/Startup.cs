@@ -31,6 +31,7 @@ namespace Dotnet.Customers.Api
             {
                 options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
             });
+            services.AddAutoMapper(typeof(Startup));
             services.AddDbContext<CustomerContext>(opt => opt.UseInMemoryDatabase("TestDb"))
                 .AddMemoryCache()
                 .AddScoped<ICustomerService, CustomerService>()
@@ -42,7 +43,7 @@ namespace Dotnet.Customers.Api
             services.AddFeatureManagement();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             app.UseSwagger()
                 .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dotnet.Customers.Api v1"))

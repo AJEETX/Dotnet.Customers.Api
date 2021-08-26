@@ -10,12 +10,11 @@ namespace Dotnet.Customers.Api.Infrastructure
     {
         public static void Initialize(IServiceProvider serviceProvider)
         {
-            using (var dbContext = new CustomerContext(
-            serviceProvider.GetRequiredService<DbContextOptions<CustomerContext>>()))
-            {
-                if (!dbContext.Customers.Any())
-                    dbContext.Customers.AddRange(new[]
-                    {
+            using var dbContext = new CustomerContext(
+            serviceProvider.GetRequiredService<DbContextOptions<CustomerContext>>());
+            if (!dbContext.Customers.Any())
+                dbContext.Customers.AddRange(new[]
+                {
                     new Customer(){
                         FirstName = "Azy",
                         LastName = "kumar",
@@ -28,8 +27,7 @@ namespace Dotnet.Customers.Api.Infrastructure
                     }
                 });
 
-                dbContext.SaveChanges();
-            }
+            dbContext.SaveChanges();
         }
     }
 }

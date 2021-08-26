@@ -1,4 +1,5 @@
-﻿using Dotnet.Customers.Api.Domain.Models;
+﻿using AutoMapper;
+using Dotnet.Customers.Api.Domain.Models;
 using Dotnet.Customers.Api.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -15,8 +16,8 @@ namespace Dotnet.Customers.Api.Domain.Services
     {
         Task<Customer> GetByIdAsync(int id);
         Task<IList<Customer>> SearchAsync(string q);
-        Task<Customer> AddAsync(CustomerDto customerDto);
-        Task UpdateAsync(int id, CustomerDto customerDto);
+        Task<Customer> AddAsync(Customer customer);
+        Task UpdateAsync(int id, Customer customer);
         Task DeleteAsync(int id);
     }
 
@@ -25,18 +26,23 @@ namespace Dotnet.Customers.Api.Domain.Services
     {
         private const string ALL = "all";
         private readonly CustomerContext _customerContext;
+        private readonly IMapper _mapper;
         private readonly IMemoryCache _memoryCache;
         private readonly AppSettings _appSettings;
-        public CustomerService(IMemoryCache memoryCache, IOptions<AppSettings> options, CustomerContext customerContext)
+        public CustomerService(IMemoryCache memoryCache, IOptions<AppSettings> options, CustomerContext customerContext, IMapper mapper)
         {
             _memoryCache = memoryCache;
             _appSettings = options.Value;
             _customerContext = customerContext;
+            _mapper = mapper;
         }
         public async Task<Customer> GetByIdAsync(int id)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
-            if (0 >= id) throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(GetByIdAsync)} {nameof(id)} = {id}");
+            if (0 >= id)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(GetByIdAsync)} {nameof(id)} = {id}");
+            }
 
             if (_memoryCache.TryGetValue(nameof(GetByIdAsync) + id.ToString(), out Customer cachedResponse)) return cachedResponse;
 
@@ -61,29 +67,28 @@ namespace Dotnet.Customers.Api.Domain.Services
             return customers;
         }
 
-        public async Task<Customer> AddAsync(CustomerDto customerDto)
+        public async Task<Customer> AddAsync(Customer customer)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
-            if (default == customerDto) throw new ArgumentNullException($"{nameof(CustomerService)}:{nameof(AddAsync)} {nameof(customerDto)} ");
-
-            //auto-mapper can be used as well instead
-            var customer = new Customer
+            if (default == customer)
             {
-                FirstName = customerDto.FirstName,
-                LastName = customerDto.LastName,
-                DateOfBirth = customerDto.DateOfBirth
-            };
+                throw new ArgumentNullException($"{nameof(CustomerService)}:{nameof(AddAsync)} {nameof(customer)} :{customer}");
+            }
 
             await _customerContext.Customers.AddAsync(customer);
 
             await _customerContext.SaveChangesAsync();
+
             return customer;
         }
 
         public async Task DeleteAsync(int id)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
-            if (0 >= id) throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(DeleteAsync)} {nameof(id)} = {id}");
+            if (0 >= id)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(DeleteAsync)} {nameof(id)} = {id}");
+            }
 
             var customer = await GetByIdAsync(id);
 
@@ -92,17 +97,13 @@ namespace Dotnet.Customers.Api.Domain.Services
             await _customerContext.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(int id, CustomerDto customerDto)
+        public async Task UpdateAsync(int id, Customer customer)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
-            if (0 >= id || customerDto == default) throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(UpdateAsync)} {nameof(id)} = {id} / or {nameof(customerDto)} is null");
-
-            var customer = await GetByIdAsync(id);
-
-            //auto-mapper can be used as well instead
-            customer.FirstName = customerDto.FirstName;
-            customer.LastName = customerDto.LastName;
-            customer.DateOfBirth = customerDto.DateOfBirth;
+            if (0 >= id || customer == default)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(CustomerService)}:{nameof(UpdateAsync)} {nameof(id)} = {id} / or {nameof(customer)} is null");
+            }
 
             _customerContext.Customers.Update(customer);
 
