@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
 using System.Collections.Generic;
-using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace Dotnet.Customers.Api.v1.Controllers
@@ -23,6 +22,7 @@ namespace Dotnet.Customers.Api.v1.Controllers
             _mapper = mapper;
             _customerService = customerService;
         }
+        [FeatureGate(Features.V1.CUSTOMER)]
         [ApiVersion(ApiVersionNumbers.V1)]
         [RequestRateLimit(Name = nameof(GetByIdAsync), Order = 1, Seconds = 1)]
         [HttpGet("{id:int}", Name = nameof(GetByIdAsync))]
@@ -46,6 +46,7 @@ namespace Dotnet.Customers.Api.v1.Controllers
             return Ok(customerDto);
         }
 
+        [FeatureGate(Features.V1.CUSTOMER)]
         [ApiVersion(ApiVersionNumbers.V1)]
         [HttpGet("{q}")]
         [ProducesResponseType(typeof(IEnumerable<CustomerDto>), StatusCodes.Status200OK)]
@@ -65,6 +66,7 @@ namespace Dotnet.Customers.Api.v1.Controllers
             return Ok(customerDtos);
         }
 
+        [FeatureGate(Features.V1.CUSTOMER)]
         [ApiVersion(ApiVersionNumbers.V1)]
         [HttpPost]
         [ProducesResponseType(typeof(CustomerDto), StatusCodes.Status201Created)]
@@ -84,6 +86,7 @@ namespace Dotnet.Customers.Api.v1.Controllers
             return CreatedAtRoute(nameof(GetByIdAsync), new { id = customer.Id }, customerDto);
         }
 
+        [FeatureGate(Features.V1.CUSTOMER)]
         [ApiVersion(ApiVersionNumbers.V1)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -109,6 +112,7 @@ namespace Dotnet.Customers.Api.v1.Controllers
             return NoContent();
         }
 
+        [FeatureGate(Features.V1.CUSTOMER)]
         [ApiVersion(ApiVersionNumbers.V1)]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
