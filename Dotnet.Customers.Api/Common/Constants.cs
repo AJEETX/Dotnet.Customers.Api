@@ -1,5 +1,9 @@
 ﻿namespace Dotnet.Customers.Api.Common
 {
+    public class Constants
+    {
+        public const string ALL = "all";
+    }
     public class SwaggerSettings
     {
         public const string Endpoints = "/swagger/{0}/swagger.json";

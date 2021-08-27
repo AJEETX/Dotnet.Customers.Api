@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Dotnet.Customers.Api.Common;
 using Dotnet.Customers.Api.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -27,18 +27,15 @@ namespace Dotnet.Customers.Api.Domain.Services
     //THE IMPLMENTATION BETTER BE `internal'
     internal class CustomerService : ICustomerService
     {
-        private const string ALL = "all";
         private readonly CustomerContext _customerContext;
-        private readonly IMapper _mapper;
         private readonly IMemoryCache _memoryCache;
         private readonly AppSettings _appSettings;
 
-        public CustomerService(IMemoryCache memoryCache, IOptions<AppSettings> options, CustomerContext customerContext, IMapper mapper)
+        public CustomerService(IMemoryCache memoryCache, IOptions<AppSettings> options, CustomerContext customerContext)
         {
             _memoryCache = memoryCache;
             _appSettings = options.Value;
             _customerContext = customerContext;
-            _mapper = mapper;
         }
 
         public async Task<Customer> GetByIdAsync(int id)
@@ -53,8 +50,9 @@ namespace Dotnet.Customers.Api.Domain.Services
 
             var customer = await _customerContext.Customers.FindAsync(id);
 
-            // SET THE CACHE WITH SEARCH KEYWORD AS KEY AND RESPONSE
+            // SET THE CACHE WITH SEARCH KEYWORD AS KEY AND `customer` as RESPONSE
             SetCache(nameof(GetByIdAsync) + id.ToString(), customer);
+
             return customer;
         }
 
@@ -62,11 +60,12 @@ namespace Dotnet.Customers.Api.Domain.Services
         {
             q = q?.ToLowerInvariant().Trim();
 
-            if (_memoryCache.TryGetValue(nameof(SearchAsync) + q ?? ALL, out IList<Customer> cachedResponse)) return cachedResponse;
+            if (_memoryCache.TryGetValue(nameof(SearchAsync) + q ?? Constants.ALL, out IList<Customer> cachedResponse)) return cachedResponse;
 
             var customers = await _customerContext.Customers.Where(c =>
             c.FirstName.ToLowerInvariant().Trim().StartsWith(q) || c.LastName.ToLowerInvariant().Trim().StartsWith(q)).ToListAsync();
 
+            // SET THE CACHE WITH SEARCH KEYWORD AS KEY AND `customers` as RESPONSE
             SetCache(nameof(SearchAsync) + q, customers);
 
             return customers;
