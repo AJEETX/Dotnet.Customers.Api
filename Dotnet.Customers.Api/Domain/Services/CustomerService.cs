@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Dotnet.Customers.Api.Domain.Models;
-using Dotnet.Customers.Api.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -15,9 +14,13 @@ namespace Dotnet.Customers.Api.Domain.Services
     public interface ICustomerService
     {
         Task<Customer> GetByIdAsync(int id);
+
         Task<IList<Customer>> SearchAsync(string q);
+
         Task<Customer> AddAsync(Customer customer);
+
         Task UpdateAsync(int id, Customer customer);
+
         Task DeleteAsync(int id);
     }
 
@@ -29,6 +32,7 @@ namespace Dotnet.Customers.Api.Domain.Services
         private readonly IMapper _mapper;
         private readonly IMemoryCache _memoryCache;
         private readonly AppSettings _appSettings;
+
         public CustomerService(IMemoryCache memoryCache, IOptions<AppSettings> options, CustomerContext customerContext, IMapper mapper)
         {
             _memoryCache = memoryCache;
@@ -36,6 +40,7 @@ namespace Dotnet.Customers.Api.Domain.Services
             _customerContext = customerContext;
             _mapper = mapper;
         }
+
         public async Task<Customer> GetByIdAsync(int id)
         {
             //ALWAYS GOOD TO INSPECT THE INCOMING TRAFFIC FOR ANY OPEN BEHAVIOUR
@@ -111,6 +116,7 @@ namespace Dotnet.Customers.Api.Domain.Services
         }
 
         #region PRIVATE BEHAVIOUR
+
         private void SetCache(string key, object value)
         {
             _memoryCache.Set(key, value, new MemoryCacheEntryOptions
@@ -119,6 +125,7 @@ namespace Dotnet.Customers.Api.Domain.Services
                 SlidingExpiration = TimeSpan.FromMinutes(_appSettings.CacheSettings.SlidingExpiration)
             });
         }
-        #endregion
+
+        #endregion PRIVATE BEHAVIOUR
     }
 }

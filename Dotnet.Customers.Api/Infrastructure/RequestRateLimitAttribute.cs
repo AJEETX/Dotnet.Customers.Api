@@ -2,10 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Dotnet.Customers.Api.Infrastructure
 {
@@ -15,6 +12,7 @@ namespace Dotnet.Customers.Api.Infrastructure
         public string Name { get; set; }
         public int Seconds { get; set; }
         private static MemoryCache Cache { get; } = new MemoryCache(new MemoryCacheOptions());
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var ipAddress = context.HttpContext.Request.HttpContext.Connection.RemoteIpAddress;

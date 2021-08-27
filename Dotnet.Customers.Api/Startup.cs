@@ -26,6 +26,11 @@ namespace Dotnet.Customers.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.SuppressMapClientErrors = true;
+                });
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());

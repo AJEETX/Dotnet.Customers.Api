@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Dotnet.Customers.Api.Common
+﻿namespace Dotnet.Customers.Api.Common
 {
     public class SwaggerSettings
     {
@@ -15,6 +10,7 @@ namespace Dotnet.Customers.Api.Common
         public const string ContactEmail = "ajeetkumar@email.com";
         public const string ContactUrl = "https://github.com/ajeetx";
     }
+
     public static class RouteNames
     {
         public const string RouteAttribute = "api/v{version:apiVersion}/[controller]";

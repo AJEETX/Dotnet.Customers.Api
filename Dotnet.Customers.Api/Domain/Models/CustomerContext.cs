@@ -8,6 +8,7 @@ namespace Dotnet.Customers.Api.Domain.Models
             : base(options)
         {
         }
+
         public DbSet<Customer> Customers { get; set; }
     }
 }
