@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Dotnet.Customers.Api.v2.Controllers
 {
-    public partial class CustomerController : BaseApiController
+    public class CustomerController : BaseApiController
     {
         private readonly IMapper _mapper;
         private readonly ICustomerService _customerService;
@@ -47,7 +47,7 @@ namespace Dotnet.Customers.Api.v2.Controllers
             return Ok(customerDto);
         }
 
-        [FeatureGate(Features.CUSTOMER_ON)]
+        [FeatureGate(Features.CUSTOMER_OFF)]
         [ApiVersion(ApiVersionNumbers.V2)]
         [HttpGet("{q}")]
         [RequestRateLimit(Name = nameof(SearchAsync), Order = 1, Seconds = 1)]
