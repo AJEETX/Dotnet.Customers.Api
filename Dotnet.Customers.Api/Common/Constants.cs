@@ -22,14 +22,8 @@ namespace Dotnet.Customers.Api.Common
 
     public class Features
     {
-        public static class V1
-        {
-            public const string CUSTOMER = "CUSTOMER";
-        }
-        public static class V2
-        {
-            public const string CUSTOMER = "CUSTOMER";
-        }
+        public const string CUSTOMER_OFF = "CUSTOMER_OFF";
+        public const string CUSTOMER_ON = "CUSTOMER_ON";
     }
 
     public class ApiVersionNumbers

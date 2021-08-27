@@ -23,7 +23,7 @@ namespace Dotnet.Customers.Api.v2.Controllers
             _mapper = mapper;
             _customerService = customerService;
         }
-        [FeatureGate(Features.V2.CUSTOMER)]
+        [FeatureGate(Features.CUSTOMER_OFF)]
         [ApiVersion(ApiVersionNumbers.V2)]
         [RequestRateLimit(Name = nameof(GetByIdAsync),Order = 1, Seconds = 1)]
         [HttpGet("{id:int}", Name = nameof(GetByIdAsync))]
