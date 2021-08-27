@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Dotnet.Customers.Api.Common;
 using Dotnet.Customers.Api.Domain.Models;
 using Dotnet.Customers.Api.Domain.Services;
 using Dotnet.Customers.Api.Dtos;
@@ -10,14 +11,9 @@ using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
-namespace Dotnet.Customers.Api.Controllers
+namespace Dotnet.Customers.Api.v2.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [FeatureGate("customer")]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
-    public class CustomerController : ControllerBase
+    public class CustomerController : BaseApiController
     {
         private readonly IMapper _mapper;
         private readonly ICustomerService _customerService;
@@ -27,7 +23,7 @@ namespace Dotnet.Customers.Api.Controllers
             _mapper = mapper;
             _customerService = customerService;
         }
-
+        [ApiVersion(ApiVersionNumbers.V2)]
         [RequestRateLimit(Name = nameof(GetByIdAsync),Order = 1, Seconds = 1)]
         [HttpGet("{id:int}", Name = nameof(GetByIdAsync))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

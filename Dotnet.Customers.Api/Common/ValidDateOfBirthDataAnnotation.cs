@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Dotnet.Customers.Api.Helpers
+namespace Dotnet.Customers.Api.Common
 {
     public class ValidDateOfBirthDataAnnotation : ValidationAttribute
     {

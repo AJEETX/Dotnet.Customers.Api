@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Dotnet.Customers.Api.Infrastructure
+namespace Dotnet.Customers.Api.Common
 {
     public class CustomerProfile : Profile
     {

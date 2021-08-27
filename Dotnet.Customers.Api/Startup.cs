@@ -1,14 +1,20 @@
+using Dotnet.Customers.Api.Common;
 using Dotnet.Customers.Api.Domain.Models;
 using Dotnet.Customers.Api.Domain.Services;
 using Dotnet.Customers.Api.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Diagnostics;
 using System.Text.Json;
@@ -32,41 +38,45 @@ namespace Dotnet.Customers.Api
                 options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
             });
             services.AddAutoMapper(typeof(Startup));
+            services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+            });
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            })
+            .AddSingleton<IConfigureOptions<SwaggerGenOptions>, ConfigureSwagger>()
+            .AddSwaggerGen(c =>
+            {
+                c.OperationFilter<SwaggerDefaultValues>();
+            });
             services.AddDbContext<CustomerContext>(opt => opt.UseInMemoryDatabase("TestDb"))
-                .AddMemoryCache()
-                .AddScoped<ICustomerService, CustomerService>()
-                .Configure<AppSettings>(Configuration.GetSection("AppSettings"))
-                .AddSwaggerGen(c =>
-                {
-                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Dotnet.Customers.Api", Version = "v1" });
-                });
+            .AddMemoryCache()
+            .AddScoped<ICustomerService, CustomerService>()
+            .Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             services.AddFeatureManagement();
         }
 
-        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IApiVersionDescriptionProvider provider, ILoggerFactory loggerFactory)
         {
-            app.UseSwagger()
-                .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dotnet.Customers.Api v1"))
-                .AddExceptionHandler(loggerFactory, Configuration)
-                .UseMiddleware<RequestResponseLogger>()
-                .UseRouting()
-                .UseEndpoints(endpoints =>
+            app.UseSwagger().UseSwaggerUI(options =>
+            {
+                foreach (var description in provider.ApiVersionDescriptions)
                 {
-                    endpoints.MapControllers();
-                });
-        }
-    }
-    public class DateTimeConverter : JsonConverter<DateTime>
-    {
-        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            Debug.Assert(typeToConvert == typeof(DateTime));
-            return DateTime.Parse(reader.GetString());
-        }
-
-        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
-        {
-            writer.WriteStringValue(value.ToString("dd-MM-yyyy"));
+                    options.SwaggerEndpoint(string.Format(SwaggerSettings.Endpoints, description.GroupName), description.GroupName.ToUpperInvariant());
+                }
+            })
+            .AddExceptionHandler(loggerFactory, Configuration)
+            .UseMiddleware<RequestResponseLogger>()
+            .UseRouting()
+            .UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }
