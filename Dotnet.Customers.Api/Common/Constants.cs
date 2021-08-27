@@ -3,7 +3,7 @@
     public class SwaggerSettings
     {
         public const string Endpoints = "/swagger/{0}/swagger.json";
-        public const string Title = "Coles.Demo.Api";
+        public const string Title = "Dotnet.Customer.Api";
         public const string ApiDescription = " REST API v{0} has been implemented.";
         public const string ApiVersionDescription = "Now, this API version [v{0}] has been deprecated.";
         public const string ContactName = "ajeet kumar";

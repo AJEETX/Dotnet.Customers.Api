@@ -53,7 +53,7 @@ namespace Dotnet.Customers.Api.v1.Controllers
         [ProducesResponseType(typeof(IEnumerable<CustomerDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Search(string q)
+        public async Task<IActionResult> SearchAsync(string q)
         {
             if (string.IsNullOrEmpty(q))
             {

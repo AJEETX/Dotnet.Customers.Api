@@ -25,8 +25,8 @@ namespace Dotnet.Customers.Api.v2.Controllers
 
         [FeatureGate(Features.CUSTOMER_OFF)]
         [ApiVersion(ApiVersionNumbers.V2)]
-        [RequestRateLimit(Name = nameof(GetByIdAsync), Order = 1, Seconds = 1)]
         [HttpGet("{id:int}", Name = nameof(GetByIdAsync))]
+        [RequestRateLimit(Name = nameof(GetByIdAsync), Order = 1, Seconds = 1)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -47,11 +47,14 @@ namespace Dotnet.Customers.Api.v2.Controllers
             return Ok(customerDto);
         }
 
+        [FeatureGate(Features.CUSTOMER_ON)]
+        [ApiVersion(ApiVersionNumbers.V2)]
         [HttpGet("{q}")]
+        [RequestRateLimit(Name = nameof(SearchAsync), Order = 1, Seconds = 1)]
         [ProducesResponseType(typeof(IEnumerable<CustomerDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Search(string q)
+        public async Task<IActionResult> SearchAsync(string q)
         {
             if (string.IsNullOrEmpty(q))
             {

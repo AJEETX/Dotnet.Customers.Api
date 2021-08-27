@@ -27,27 +27,24 @@ namespace Dotnet.Customers.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-                .ConfigureApiBehaviorOptions(options =>
-                {
-                    options.SuppressMapClientErrors = true;
-                });
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressMapClientErrors = true;
+            });
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
             });
-            services
-            .AddAutoMapper(typeof(Startup)).AddApiVersioning(options =>
+            services.AddAutoMapper(typeof(Startup)).AddApiVersioning(options =>
             {
                 options.DefaultApiVersion = new ApiVersion(1, 0);
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.ReportApiVersions = true;
-            })
-            .AddVersionedApiExplorer(options =>
+            }).AddVersionedApiExplorer(options =>
             {
                 options.GroupNameFormat = "'v'VVV";
                 options.SubstituteApiVersionInUrl = true;
-            })
-            .AddSingleton<IConfigureOptions<SwaggerGenOptions>, ConfigureSwagger>()
+            }).AddSingleton<IConfigureOptions<SwaggerGenOptions>, ConfigureSwagger>()
             .AddSwaggerGen(c =>
             {
                 c.OperationFilter<SwaggerDefaultValues>();
